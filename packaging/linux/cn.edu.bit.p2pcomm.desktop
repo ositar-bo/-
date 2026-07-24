@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=北京理工大学点对点通信
+Comment=IP点对点文字与视频通信系统
+Exec=BIT点对点通信
+Icon=cn.edu.bit.p2pcomm
+Terminal=false
+Categories=Network;Utility;
+StartupNotify=true

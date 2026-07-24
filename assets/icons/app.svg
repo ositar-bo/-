@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="92" fill="#0b120e"/>
+  <circle cx="256" cy="256" r="174" fill="none" stroke="#b8c59d" stroke-width="18"/>
+  <path d="M150 255h212M256 149v214" stroke="#4f8257" stroke-width="25" stroke-linecap="round"/>
+  <circle cx="256" cy="256" r="54" fill="#29442d" stroke="#e8eee9" stroke-width="12"/>
+  <text x="256" y="282" text-anchor="middle" font-family="sans-serif" font-size="68" font-weight="700" fill="#fff">BIT</text>
+</svg>
