@@ -1,12 +1,24 @@
 #!/usr/bin/env bash
 set -euo pipefail
+
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
+SVG="$ROOT/assets/icons/app.svg"
 ICONSET="$ROOT/packaging/macos/AppIcon.iconset"
-rm -rf "$ICONSET"; mkdir -p "$ICONSET"
-for S in 16 32 128 256 512; do
-  qlmanage -t -s "$S" -o /tmp "$ROOT/assets/icons/app.svg" >/dev/null 2>&1 || true
-  SRC="/tmp/app.svg.png"
-  sips -z "$S" "$S" "$SRC" --out "$ICONSET/icon_${S}x${S}.png" >/dev/null
-  D=$((S*2)); sips -z "$D" "$D" "$SRC" --out "$ICONSET/icon_${S}x${S}@2x.png" >/dev/null
+ICNS="$ROOT/packaging/macos/AppIcon.icns"
+
+command -v rsvg-convert >/dev/null 2>&1 || {
+  echo "错误：未找到 rsvg-convert，请先安装 librsvg。"
+  exit 1
+}
+
+rm -rf "$ICONSET" "$ICNS"
+mkdir -p "$ICONSET"
+
+for size in 16 32 128 256 512; do
+  rsvg-convert -w "$size" -h "$size" "$SVG" -o "$ICONSET/icon_${size}x${size}.png"
+  double=$((size * 2))
+  rsvg-convert -w "$double" -h "$double" "$SVG" -o "$ICONSET/icon_${size}x${size}@2x.png"
 done
-iconutil -c icns "$ICONSET" -o "$ROOT/packaging/macos/AppIcon.icns"
+
+iconutil -c icns "$ICONSET" -o "$ICNS"
+echo "已生成图标：$ICNS"
