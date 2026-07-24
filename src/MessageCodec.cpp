@@ -2,6 +2,7 @@
 
 #include <QDataStream>
 #include <QJsonDocument>
+#include <QIODevice>
 
 namespace {
 constexpr quint32 kMaxFrameSize = 4U * 1024U * 1024U;
