@@ -1,28 +1,48 @@
 name: Build desktop packages
+
 on:
   workflow_dispatch:
   push:
-    tags: ['v*']
+    tags:
+      - 'v*'
 
 jobs:
   linux-appimage:
+    name: Linux AppImage
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: jurplel/install-qt-action@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
         with:
           version: '6.8.3'
           modules: 'qtmultimedia'
           cache: true
-      - run: sudo apt-get update && sudo apt-get install -y ninja-build libfuse2 patchelf
-      - run: ./packaging/linux/build-appimage.sh
-      - uses: actions/upload-artifact@v4
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build libfuse2 patchelf wget file
+
+      - name: Build AppImage
+        shell: bash
+        env:
+          APPIMAGE_EXTRACT_AND_RUN: '1'
+        run: bash packaging/linux/build-appimage.sh
+
+      - name: Upload AppImage
+        uses: actions/upload-artifact@v4
         with:
           name: Linux-AppImage-x86_64
           path: dist/*.AppImage
+          if-no-files-found: error
 
   macos-dmg:
+    name: macOS DMG (${{ matrix.arch }})
     strategy:
+      fail-fast: false
       matrix:
         include:
           - os: macos-13
@@ -31,15 +51,28 @@ jobs:
             arch: arm64
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: jurplel/install-qt-action@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
         with:
           version: '6.8.3'
           modules: 'qtmultimedia'
           cache: true
-      - run: brew install ninja
-      - run: ./packaging/macos/build-dmg.sh
-      - uses: actions/upload-artifact@v4
+
+      - name: Install build dependencies
+        run: brew install ninja librsvg
+
+      - name: Build DMG
+        shell: bash
+        env:
+          TARGET_ARCH: ${{ matrix.arch }}
+        run: bash packaging/macos/build-dmg.sh
+
+      - name: Upload DMG
+        uses: actions/upload-artifact@v4
         with:
           name: macOS-DMG-${{ matrix.arch }}
           path: dist/*.dmg
+          if-no-files-found: error
